@@ -1,6 +1,6 @@
 import vsketch
-from shapely.geometry import Point, LineString
-
+from shapely.geometry import Point, LineString, MultiLineString
+from shapely import get_parts, get_coordinates
 
 class Connection:
 
@@ -13,9 +13,9 @@ class Connection:
 
     def dashes(vsk, p1, p2):
         path = Connection.line(vsk, p1, p2).segmentize(10)
-        print(path)
-
-        return path
+        coords = get_coordinates(path)
+        # This is a bit wrong if for one of odd or even length linestrings but I'm not fixing it now
+        return MultiLineString([[coords[i], coords[i+1]] for i in range(0, len(coords)-1, 2) ])
 
 
 connection_kind = {
