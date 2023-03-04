@@ -7,9 +7,21 @@ class Connection:
     def line(vsk, p1, p2):
         return LineString([p1, p2])
 
+    def circles(vsk, p1, p2):
+        path = Connection.line(vsk, p1, p2)
+        return path
+
+    def dashes(vsk, p1, p2):
+        path = Connection.line(vsk, p1, p2).segmentize(10)
+        print(path)
+
+        return path
+
 
 connection_kind = {
     "line": Connection.line,
+    "circles": Connection.circles,
+    "dashes": Connection.dashes,
 }
 
 
