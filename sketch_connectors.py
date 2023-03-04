@@ -1,5 +1,5 @@
 import vsketch
-from shapely.geometry import Point, LineString, MultiLineString
+from shapely.geometry import GeometryCollection, Point, LineString, MultiLineString
 from shapely import get_parts, get_coordinates
 
 class Connection:
@@ -7,15 +7,21 @@ class Connection:
     def line(vsk, p1, p2):
         return LineString([p1, p2])
 
+    def points(vsk, p1, p2):
+        max_distance= 10;
+        path = Connection.line(vsk, p1, p2).segmentize(max_distance)
+        points = [Point(p) for p in get_coordinates(path)]
+        return points
+
     def circles(vsk, p1, p2):
-        path = Connection.line(vsk, p1, p2)
-        return path
+        points = Connection.points(vsk, p1, p2)
+        radius = points[0].distance(points[1]) / 2
+        return GeometryCollection([p.buffer(radius) for p in points] )
 
     def dashes(vsk, p1, p2):
-        path = Connection.line(vsk, p1, p2).segmentize(10)
-        coords = get_coordinates(path)
+        points = Connection.points(vsk, p1,p2)
         # This is a bit wrong if for one of odd or even length linestrings but I'm not fixing it now
-        return MultiLineString([[coords[i], coords[i+1]] for i in range(0, len(coords)-1, 2) ])
+        return MultiLineString([[points[i], points[i+1]] for i in range(0, len(points)-1, 2) ])
 
 
 connection_kind = {
